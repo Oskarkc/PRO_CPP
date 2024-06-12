@@ -14,6 +14,7 @@ Game::Game() : window(sf::VideoMode(1200, 700), "MonkeyTyperByOskar",
     if (!font.loadFromFile("../arial.ttf")) {
         std::cout << "Failed to load font.\n";
     }
+    chosenfont=font;
     fonty.push_back(font);
 
     loadfonts();
@@ -25,7 +26,12 @@ Game::Game() : window(sf::VideoMode(1200, 700), "MonkeyTyperByOskar",
     logo.setTexture(texture);
     logo.setPosition(50,-100);
 
-
+    if(!backgroundtext.loadFromFile("../background.jpeg")){
+        std::cout << "Failed to load image.\n";
+    }
+    backgroundsprite = sf::Sprite();
+    backgroundsprite.setTexture(backgroundtext);
+    backgroundsprite.setPosition(475,300);
 
     panel.setSize(sf::Vector2f(1200,100));
     panel.setFillColor(sf::Color::White);
@@ -45,10 +51,16 @@ Game::Game() : window(sf::VideoMode(1200, 700), "MonkeyTyperByOskar",
     yourInput = sf::Text(sf::String("Your Input:"),font,32);
     backtoMenu = sf::Text(sf::String("BACK TO MENU"),font,32);
     chooseLanguage = sf::Text(sf::String("Choose Language"),font,32);
+    chooseFont = sf::Text(sf::String("Choose Font"),font , 32);
     FR = sf::Text(sf::String("FR"),font,32);
     ENG = sf::Text(sf::String("ENG"),font,32);
     PL = sf::Text(sf::String("PL"),font,32);
     ESP = sf::Text(sf::String("ESP"),font,32);
+    EASY = sf::Text(sf::String("Easy"),font,32);
+    HARD = sf::Text(sf::String("Hard"),font,32);
+    font1 = sf::Text(sf::String("abcdefgABCDEFG"),fonty[0],32);
+    font2 = sf::Text(sf::String("abcdefgABCDEFG"),fonty[1],32);
+    font3 = sf::Text(sf::String("abcdefgABCDEFG"),fonty[2],32);
 
 
 
@@ -74,6 +86,8 @@ Game::Game() : window(sf::VideoMode(1200, 700), "MonkeyTyperByOskar",
     yourInput.setPosition(5,5);
     chooseLanguage.setPosition(200,400);
     chooseLanguage.setFillColor(sf::Color::White);
+    chooseFont.setPosition(200,450);
+    chooseFont.setFillColor(sf::Color::White);
     FR.setPosition(250,450);
     FR.setFillColor(sf::Color::White);
     ENG.setPosition(475,450);
@@ -82,6 +96,16 @@ Game::Game() : window(sf::VideoMode(1200, 700), "MonkeyTyperByOskar",
     ESP.setFillColor(sf::Color::White);
     PL.setFillColor(sf::Color::White);
     PL.setPosition(325,450);
+    EASY.setFillColor(sf::Color::White);
+    EASY.setPosition(250,350);
+    HARD.setFillColor(sf::Color::White);
+    HARD.setPosition(450,350);
+    font1.setPosition(300,350);
+    font2.setPosition(300,400);
+    font3.setPosition(300,450);
+    font1.setFillColor(sf::Color::White);
+    font2.setFillColor(sf::Color::White);
+    font3.setFillColor(sf::Color::White);
 
 
 
@@ -90,7 +114,7 @@ Game::Game() : window(sf::VideoMode(1200, 700), "MonkeyTyperByOskar",
 void Game::start() {
 
     std::string text="";
-    auto livetext = sf::Text(text,font,32);
+    livetext = sf::Text(text,font,32);
     livetext.setFillColor(sf::Color::Black);
     livetext.setPosition(50,50);
 
@@ -109,22 +133,40 @@ void Game::start() {
 
         }
         if (isSettings) {
-            window.clear(sf::Color::Black);
             window.draw(logo);
             window.draw(buttonBack);
             window.draw(chooseLanguage);
+            window.draw(chooseFont);
+
+        }
+        if(isChooseFont){
+            window.draw(logo);
+            window.draw(font1);
+            window.draw(font2);
+            window.draw(font3);
+            window.draw(buttonBack);
+        }
+        if(isChooseLanguage){
             window.draw(FR);
             window.draw(PL);
             window.draw(ESP);
             window.draw(ENG);
+            window.draw(buttonBack);
+            window.draw(logo);
+        }
+        if(chooselevel){
+            window.draw(logo);
+            window.draw(EASY);
+            window.draw(HARD);
+            window.draw(buttonBack);
         }
         if(isAbout) {
-            window.clear(sf::Color::Black);
             window.draw(logo);
             window.draw(about);
             window.draw(buttonBack);
         }
         if(isGame) {
+            window.draw(backgroundsprite);
             window.draw(panel);
             window.draw(timer);
             window.draw(score);
@@ -141,6 +183,7 @@ void Game::start() {
             if(zycia==0){
                 isGame=false;
                 isGameover=true;
+                text = "";
             }
         }
         if(isGameover){
@@ -211,6 +254,41 @@ void Game::start() {
                     } else {
                         buttonBack.setFillColor(sf::Color::White);
                     }
+                    if (chooseLanguage.getGlobalBounds().contains((mousepos.x),(mousepos.y))) {
+                        chooseLanguage.setFillColor(sf::Color(169, 169, 169));
+                    } else {
+                        chooseLanguage.setFillColor(sf::Color::White);
+                    }
+                    if (chooseFont.getGlobalBounds().contains((mousepos.x),(mousepos.y))) {
+                        chooseFont.setFillColor(sf::Color(169, 169, 169));
+                    } else {
+                        chooseFont.setFillColor(sf::Color::White);
+                    }
+                }
+                if (event.type == sf::Event::MouseButtonPressed) {
+                    if (buttonBack.getGlobalBounds().contains((mousepos.x),(mousepos.y))) {
+                        isSettings = false;
+                        isMenu = true;
+                    }
+                    if(chooseLanguage.getGlobalBounds().contains(mousepos.x,mousepos.y)){
+                        isSettings = false;
+                        isChooseLanguage = true;
+                    }
+                    if(chooseFont.getGlobalBounds().contains(mousepos.x,mousepos.y)){
+                        isSettings=false;
+                        isChooseFont=true;
+                    }
+
+                }
+            }
+            else if(isChooseLanguage) {
+                if (event.type == sf::Event::MouseMoved) {
+                    mousepos = sf::Mouse::getPosition(window);
+                    if (buttonBack.getGlobalBounds().contains((mousepos.x),(mousepos.y))) {
+                        buttonBack.setFillColor(sf::Color(169, 169, 169));
+                    } else {
+                        buttonBack.setFillColor(sf::Color::White);
+                    }
                     if (ENG.getGlobalBounds().contains((mousepos.x),(mousepos.y))) {
                         ENG.setFillColor(sf::Color(169, 169, 169));
                     } else {
@@ -233,34 +311,112 @@ void Game::start() {
                     }
                 }
                 if (event.type == sf::Event::MouseButtonPressed) {
-                    if (buttonBack.getGlobalBounds().contains((mousepos.x),(mousepos.y))) {
-                        isSettings = false;
-                        isMenu = true;
+                    if (buttonBack.getGlobalBounds().contains((mousepos.x), (mousepos.y))) {
+                        isChooseLanguage = false;
+                        isSettings = true;
                     }
                     if (ENG.getGlobalBounds().contains((mousepos.x),(mousepos.y))) {
-                        isSettings = false;
-                        isMenu = true;
-                        language = "../ENGslownik.txt";
+                        chooselevel= true;
+                        isChooseLanguage = false;
+                        language = "../ENGslownik";
                     }
                     if (FR.getGlobalBounds().contains((mousepos.x),(mousepos.y))) {
-                        isSettings = false;
-                        isMenu = true;
-                        language = "../FRslownik.txt";
+                        chooselevel = true;
+                        isChooseLanguage = false;
+                        language = "../FRslownik";
                     }
                     if (ESP.getGlobalBounds().contains((mousepos.x),(mousepos.y))) {
-                        isSettings = false;
-                        isMenu = true;
-                        language = "../ESPslownik.txt";
+                        chooselevel = true;
+                        isChooseLanguage = false;
+                        language = "../ESPslownik";
                     }
                     if (PL.getGlobalBounds().contains((mousepos.x),(mousepos.y))) {
-                        isSettings = false;
-                        isMenu = true;
-                        language = "../PLslownik.txt";
+                        chooselevel = true;
+                        isChooseLanguage = false;
+                        language = "../PLslownik";
                     }
-
+                }
+            }
+            else if(chooselevel) {
+                if (event.type == sf::Event::MouseMoved) {
+                    mousepos = sf::Mouse::getPosition(window);
+                    if (buttonBack.getGlobalBounds().contains((mousepos.x), (mousepos.y))) {
+                        buttonBack.setFillColor(sf::Color(169, 169, 169));
+                    } else {
+                        buttonBack.setFillColor(sf::Color::White);
+                    }
+                    if (EASY.getGlobalBounds().contains((mousepos.x),(mousepos.y))) {
+                        EASY.setFillColor(sf::Color(169, 169, 169));
+                    } else {
+                        EASY.setFillColor(sf::Color::White);
+                    }
+                    if (HARD.getGlobalBounds().contains((mousepos.x),(mousepos.y))) {
+                        HARD.setFillColor(sf::Color(169, 169, 169));
+                    } else {
+                        HARD.setFillColor(sf::Color::White);
+                    }
+                }
+                if (event.type == sf::Event::MouseButtonPressed) {
+                    if(EASY.getGlobalBounds().contains(mousepos.x,mousepos.y)){
+                        chooselevel = false;
+                        isSettings= true;
+                    }
+                    if(HARD.getGlobalBounds().contains(mousepos.x,mousepos.y)){
+                        language.push_back('h');
+                        chooselevel = false;
+                        isSettings = true;
+                    }
                 }
 
-            } else if(isAbout){
+            }
+            else if(isChooseFont){
+                if (event.type == sf::Event::MouseMoved) {
+                    mousepos = sf::Mouse::getPosition(window);
+                    if (buttonBack.getGlobalBounds().contains((mousepos.x),(mousepos.y))) {
+                        buttonBack.setFillColor(sf::Color(169, 169, 169));
+                    } else {
+                        buttonBack.setFillColor(sf::Color::White);
+                    }
+                    if (font1.getGlobalBounds().contains((mousepos.x),(mousepos.y))) {
+                        font1.setFillColor(sf::Color(169, 169, 169));
+                    } else {
+                        font1.setFillColor(sf::Color::White);
+                    }
+                    if (font2.getGlobalBounds().contains((mousepos.x),(mousepos.y))) {
+                        font2.setFillColor(sf::Color(169, 169, 169));
+                    } else {
+                        font2.setFillColor(sf::Color::White);
+                    }
+                    if (font3.getGlobalBounds().contains((mousepos.x),(mousepos.y))) {
+                        font3.setFillColor(sf::Color(169, 169, 169));
+                    } else {
+                        font3.setFillColor(sf::Color::White);
+                    }
+                }
+                if (event.type == sf::Event::MouseButtonPressed) {
+                    if (buttonBack.getGlobalBounds().contains((mousepos.x), (mousepos.y))) {
+                        isChooseFont = false;
+                        isSettings = true;
+                    }
+                    if(font1.getGlobalBounds().contains(mousepos.x,mousepos.y)){
+                        chosenfont = fonty[0];
+                        isChooseFont= false;
+                        isSettings = true;
+                    }
+                    if(font2.getGlobalBounds().contains(mousepos.x,mousepos.y)){
+                        chosenfont = fonty[1];
+                        isChooseFont= false;
+                        isSettings = true;
+                    }
+                    if(font3.getGlobalBounds().contains(mousepos.x,mousepos.y)){
+                        chosenfont = fonty[2];
+                        isChooseFont= false;
+                        isSettings = true;
+                    }
+                }
+
+            }
+            else if(isAbout){
                 if (event.type == sf::Event::MouseMoved) {
                     mousepos = sf::Mouse::getPosition(window);
                     if (buttonBack.getGlobalBounds().contains((mousepos.x),(mousepos.y))) {
@@ -304,7 +460,9 @@ void Game::start() {
                         text="";
                         respawntime();
                     } else if ( event.key.code == sf::Keyboard::BackSpace){
-                        text.pop_back();
+                        if(!text.empty()){
+                            text.pop_back();
+                        }
                     } else if (event.key.code == sf::Keyboard::Escape){
                         isGame=false;
                         pausegame = true;
@@ -362,9 +520,14 @@ sf::Text Game::slowo(){
     auto randomY = rand()%500+101;
     auto random = rand()%words.size();
     words[random].setPosition(-50, randomY);
+    for(int i=0 ; i < slowanaekranie.size() ; i++){
+        if (words[random].getGlobalBounds().intersects(slowanaekranie[i].getGlobalBounds())){
+            return slowo();
+        }
+    }
     words[random].setFillColor(sf::Color::White);
-    words[random].setCharacterSize(rand()%32+18);
-    words[random].setFont(fonty[rand()%fonty.size()]);
+    words[random].setCharacterSize(24);
+    words[random].setFont(chosenfont);
     return words[random];
 }
 void Game::generator(){

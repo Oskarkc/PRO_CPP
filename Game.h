@@ -12,12 +12,17 @@ public:
 Game();
 void start();
 private:
-    std::string language = "../PLslownik.txt";
+
+    std::string language = "../PLslownik";
+    std::string chosenlvl = "../PLslownik";
     sf::RenderWindow window;
     sf::Font font;
+    sf::Font chosenfont;
     std::vector<sf::Font> fonty;
     std::vector<sf::Text> words;
     sf::Texture texture;
+    sf::Texture backgroundtext;
+    sf::Sprite backgroundsprite;
     sf::Sprite logo;
     sf::Text about;
     sf::Text buttonStart;
@@ -29,10 +34,16 @@ private:
     sf::Text yourInput;
     sf::Text backtoMenu;
     sf::Text chooseLanguage;
+    sf::Text chooseFont;
+    sf::Text font1;
+    sf::Text font2;
+    sf::Text font3;
     sf::Text FR;
     sf::Text ENG;
     sf::Text PL;
     sf::Text ESP;
+    sf::Text EASY;
+    sf::Text HARD;
     sf::RectangleShape panel;
     sf::Text timer;
     double number=0.0;
@@ -53,6 +64,9 @@ private:
     bool isGame = false;
     bool isGameover = false;
     bool pausegame = false;
+    bool isChooseLanguage = false;
+    bool chooselevel = false;
+    bool isChooseFont = false;
     float move=0.1;
     float respawn=2;
     void dodajslowa();
