@@ -12,6 +12,7 @@ public:
 Game();
 void start();
 private:
+    std::string language = "../PLslownik.txt";
     sf::RenderWindow window;
     sf::Font font;
     std::vector<sf::Font> fonty;
@@ -27,6 +28,11 @@ private:
     sf::Text tryAgain;
     sf::Text yourInput;
     sf::Text backtoMenu;
+    sf::Text chooseLanguage;
+    sf::Text FR;
+    sf::Text ENG;
+    sf::Text PL;
+    sf::Text ESP;
     sf::RectangleShape panel;
     sf::Text timer;
     double number=0.0;

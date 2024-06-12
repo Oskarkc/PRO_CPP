@@ -5,6 +5,7 @@
 #include "Game.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <fstream>
 
 Game::Game() : window(sf::VideoMode(1200, 700), "MonkeyTyperByOskar",
                       sf::Style::Default, sf::ContextSettings(0, 0, 4)) {
@@ -43,6 +44,12 @@ Game::Game() : window(sf::VideoMode(1200, 700), "MonkeyTyperByOskar",
     tryAgain = sf::Text(sf::String("Try Again"),font , 32);
     yourInput = sf::Text(sf::String("Your Input:"),font,32);
     backtoMenu = sf::Text(sf::String("BACK TO MENU"),font,32);
+    chooseLanguage = sf::Text(sf::String("Choose Language"),font,32);
+    FR = sf::Text(sf::String("FR"),font,32);
+    ENG = sf::Text(sf::String("ENG"),font,32);
+    PL = sf::Text(sf::String("PL"),font,32);
+    ESP = sf::Text(sf::String("ESP"),font,32);
+
 
 
     buttonStart.setPosition(200, 300);
@@ -65,8 +72,18 @@ Game::Game() : window(sf::VideoMode(1200, 700), "MonkeyTyperByOskar",
     tryAgain.setPosition(350,575);
     yourInput.setFillColor(sf::Color::Black);
     yourInput.setPosition(5,5);
+    chooseLanguage.setPosition(200,400);
+    chooseLanguage.setFillColor(sf::Color::White);
+    FR.setPosition(250,450);
+    FR.setFillColor(sf::Color::White);
+    ENG.setPosition(475,450);
+    ENG.setFillColor(sf::Color::White);
+    ESP.setPosition(390,450);
+    ESP.setFillColor(sf::Color::White);
+    PL.setFillColor(sf::Color::White);
+    PL.setPosition(325,450);
 
-    dodajslowa();
+
 
 }
 
@@ -95,6 +112,11 @@ void Game::start() {
             window.clear(sf::Color::Black);
             window.draw(logo);
             window.draw(buttonBack);
+            window.draw(chooseLanguage);
+            window.draw(FR);
+            window.draw(PL);
+            window.draw(ESP);
+            window.draw(ENG);
         }
         if(isAbout) {
             window.clear(sf::Color::Black);
@@ -170,6 +192,7 @@ void Game::start() {
                         isMenu = false;
                         isGame = true;
                         zegar.restart();
+                        dodajslowa();
                     } else if (buttonSettings.getGlobalBounds().contains((mousepos.x),(mousepos.y))) {
                         isMenu = false;
                         isSettings = true;
@@ -188,12 +211,53 @@ void Game::start() {
                     } else {
                         buttonBack.setFillColor(sf::Color::White);
                     }
+                    if (ENG.getGlobalBounds().contains((mousepos.x),(mousepos.y))) {
+                        ENG.setFillColor(sf::Color(169, 169, 169));
+                    } else {
+                        ENG.setFillColor(sf::Color::White);
+                    }
+                    if (ESP.getGlobalBounds().contains((mousepos.x),(mousepos.y))) {
+                        ESP.setFillColor(sf::Color(169, 169, 169));
+                    } else {
+                        ESP.setFillColor(sf::Color::White);
+                    }
+                    if (PL.getGlobalBounds().contains((mousepos.x),(mousepos.y))) {
+                        PL.setFillColor(sf::Color(169, 169, 169));
+                    } else {
+                        PL.setFillColor(sf::Color::White);
+                    }
+                    if (FR.getGlobalBounds().contains((mousepos.x),(mousepos.y))) {
+                        FR.setFillColor(sf::Color(169, 169, 169));
+                    } else {
+                        FR.setFillColor(sf::Color::White);
+                    }
                 }
                 if (event.type == sf::Event::MouseButtonPressed) {
                     if (buttonBack.getGlobalBounds().contains((mousepos.x),(mousepos.y))) {
                         isSettings = false;
                         isMenu = true;
                     }
+                    if (ENG.getGlobalBounds().contains((mousepos.x),(mousepos.y))) {
+                        isSettings = false;
+                        isMenu = true;
+                        language = "../ENGslownik.txt";
+                    }
+                    if (FR.getGlobalBounds().contains((mousepos.x),(mousepos.y))) {
+                        isSettings = false;
+                        isMenu = true;
+                        language = "../FRslownik.txt";
+                    }
+                    if (ESP.getGlobalBounds().contains((mousepos.x),(mousepos.y))) {
+                        isSettings = false;
+                        isMenu = true;
+                        language = "../ESPslownik.txt";
+                    }
+                    if (PL.getGlobalBounds().contains((mousepos.x),(mousepos.y))) {
+                        isSettings = false;
+                        isMenu = true;
+                        language = "../PLslownik.txt";
+                    }
+
                 }
 
             } else if(isAbout){
@@ -215,6 +279,15 @@ void Game::start() {
                 if(event.type==sf::Event::TextEntered){
                     if(std::isalnum(event.text.unicode)){ //https://en.cppreference.com/w/cpp/string/byte/isalnum
                         text+=event.text.unicode;
+                    }
+                    for (auto it = slowanaekranie.begin() ; it!=slowanaekranie.end();++it) {
+                        if(*text.begin() == *it->getString().begin()){
+                            it->setFillColor(sf::Color::Green);
+                            break;
+                        }
+                        else if(*text.begin() != *it->getString().begin()){
+                            it->setFillColor(sf::Color::White);
+                        }
                     }
                 }
                 if(event.type==sf::Event::KeyPressed){
@@ -279,13 +352,11 @@ void Game::start() {
     }
 }
 void Game::dodajslowa() {
-    words={sf::Text(sf::String("hejka"),font,32),
-           sf::Text(sf::String("elo"),font,32),
-           sf::Text(sf::String("witam"),font,32),
-           sf::Text(sf::String("bonjour"),font,32),
-           sf::Text(sf::String("hi"),font,32),
-           sf::Text(sf::String("welcome"),font,32),
-           sf::Text(sf::String("vamos"),font,32)};
+    auto file = std::fstream(language);
+    std::string line;
+    while (std::getline(file, line)) {
+        words.push_back(sf::Text(sf::String(line), font, 64));
+    }
 }
 sf::Text Game::slowo(){
     auto randomY = rand()%500+101;
@@ -356,6 +427,8 @@ void Game::resetGame(){
     number = 0;
     zycia = 5;
     scorenumber=0;
+    move = 0.1;
+    respawn = 2;
     gameButtonsettings();
     for(auto it = slowanaekranie.begin(); it != slowanaekranie.end();){
         slowanaekranie.erase(it);
